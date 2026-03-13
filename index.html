@@ -11,8 +11,8 @@
 <!-- Auth Screen -->
 <div id="auth-screen" class="screen hidden">
   <div class="auth-container">
-    <h1 class="auth-title">Planner</h1>
-    <p class="auth-subtitle">Расписание тренера</p>
+    <h1 class="auth-title">Иван Ведеров</h1>
+    <p class="auth-subtitle">Расписание тренера по скольжению</p>
     <form id="login-form">
       <div class="form-group">
         <label class="form-label">Email</label>
@@ -52,7 +52,10 @@
       <div id="schedule-draft" class="hidden">
         <div class="schedule-status-bar">
           <span class="status-badge status-draft">Черновик</span>
-          <button id="publish-btn" class="btn btn-success btn-sm">Опубликовать</button>
+          <div style="display:flex;gap:8px">
+            <button id="publish-btn" class="btn btn-success btn-sm">Опубликовать</button>
+            <button id="delete-schedule-btn" class="btn btn-sm" style="background:#fee2e2;color:#dc2626">Удалить</button>
+          </div>
         </div>
         <div id="slots-list"></div>
         <button id="add-slot-btn" class="btn btn-outline btn-full mt-2">+ Добавить слот</button>

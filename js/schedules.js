@@ -112,6 +112,18 @@ async function createSchedule() {
   }
 }
 
+async function deleteSchedule() {
+  if (!currentTemplate) return;
+  openConfirm(
+    'Удалить расписание?',
+    'Расписание и все слоты будут удалены безвозвратно.',
+    async () => {
+      await api.delete(`/api/schedules/${currentTemplate.id}`);
+      await loadSchedule();
+    }
+  );
+}
+
 async function publishSchedule() {
   if (!currentTemplate) return;
   openConfirm(
@@ -181,6 +193,7 @@ function initSchedules() {
   });
   document.getElementById('create-schedule-btn').addEventListener('click', createSchedule);
   document.getElementById('publish-btn').addEventListener('click', publishSchedule);
+  document.getElementById('delete-schedule-btn').addEventListener('click', deleteSchedule);
   document.getElementById('add-slot-btn').addEventListener('click', openAddSlotModal);
 
   initSlotTypeToggle();

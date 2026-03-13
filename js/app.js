@@ -27,6 +27,7 @@ function openConfirm(title, message, onConfirm) {
 }
 
 // Tab navigation
+let appInitialized = false;
 const TABS = ['schedules', 'students', 'venues'];
 const TAB_TITLES = { schedules: 'Расписание', students: 'Ученики', venues: 'Катки' };
 
@@ -50,6 +51,12 @@ function switchTab(tab) {
 }
 
 function initApp() {
+  if (appInitialized) {
+    switchTab(activeTab);
+    return;
+  }
+  appInitialized = true;
+
   // Nav
   document.querySelectorAll('.nav-item').forEach(btn => {
     btn.addEventListener('click', () => switchTab(btn.dataset.tab));
