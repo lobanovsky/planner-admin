@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Planner — Admin</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Auth Screen -->
+<div id="auth-screen" class="screen hidden">
+  <div class="auth-container">
+    <h1 class="auth-title">Planner</h1>
+    <p class="auth-subtitle">Расписание тренера</p>
+    <form id="login-form">
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" id="login-email" class="form-input" placeholder="ivan@example.com" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Пароль</label>
+        <input type="password" id="login-password" class="form-input" placeholder="••••••••" required>
+      </div>
+      <div id="login-error" class="error-msg hidden"></div>
+      <button type="submit" class="btn btn-primary btn-full">Войти</button>
+    </form>
+  </div>
+</div>
+
+<!-- Main App -->
+<div id="app-screen" class="screen hidden">
+  <header class="app-header">
+    <span id="header-title" class="header-title">Расписание</span>
+    <button id="logout-btn" class="btn-icon" title="Выйти">⎋</button>
+  </header>
+
+  <main class="app-main">
+    <!-- Schedules Tab -->
+    <div id="tab-schedules" class="tab-content">
+      <div class="week-nav">
+        <button id="week-prev" class="btn-icon week-btn">&#8249;</button>
+        <span id="week-label" class="week-label">загрузка...</span>
+        <button id="week-next" class="btn-icon week-btn">&#8250;</button>
+      </div>
+
+      <div id="schedule-empty" class="empty-state hidden">
+        <p>Расписание на эту неделю не создано</p>
+        <button id="create-schedule-btn" class="btn btn-primary">Создать расписание</button>
+      </div>
+
+      <div id="schedule-draft" class="hidden">
+        <div class="schedule-status-bar">
+          <span class="status-badge status-draft">Черновик</span>
+          <button id="publish-btn" class="btn btn-success btn-sm">Опубликовать</button>
+        </div>
+        <div id="slots-list"></div>
+        <button id="add-slot-btn" class="btn btn-outline btn-full mt-2">+ Добавить слот</button>
+      </div>
+
+      <div id="schedule-published" class="hidden">
+        <div class="schedule-status-bar">
+          <span class="status-badge status-published">Опубликовано</span>
+        </div>
+        <div id="slots-list-pub"></div>
+      </div>
+    </div>
+
+    <!-- Students Tab -->
+    <div id="tab-students" class="tab-content hidden">
+      <button id="add-student-btn" class="btn btn-primary btn-full mb-2">+ Добавить ученика</button>
+      <div id="students-list"></div>
+    </div>
+
+    <!-- Venues Tab -->
+    <div id="tab-venues" class="tab-content hidden">
+      <button id="add-venue-btn" class="btn btn-primary btn-full mb-2">+ Добавить каток</button>
+      <div id="venues-list"></div>
+    </div>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-tab="schedules">
+      <span class="nav-icon">📅</span>
+      <span class="nav-label">Расписание</span>
+    </button>
+    <button class="nav-item" data-tab="students">
+      <span class="nav-icon">👤</span>
+      <span class="nav-label">Ученики</span>
+    </button>
+    <button class="nav-item" data-tab="venues">
+      <span class="nav-icon">🏟</span>
+      <span class="nav-label">Катки</span>
+    </button>
+  </nav>
+</div>
+
+<!-- Modal Overlay -->
+<div id="modal-overlay" class="modal-overlay hidden"></div>
+
+<!-- Venue Modal -->
+<div id="venue-modal" class="modal hidden">
+  <div class="modal-handle"></div>
+  <h2 class="modal-title" id="venue-modal-title">Каток</h2>
+  <form id="venue-form">
+    <input type="hidden" id="venue-id">
+    <div class="form-group">
+      <label class="form-label">Название *</label>
+      <input type="text" id="venue-name" class="form-input" placeholder="Луч" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Описание</label>
+      <input type="text" id="venue-desc" class="form-input" placeholder="ул. Ленина 5">
+    </div>
+    <div id="venue-error" class="error-msg hidden"></div>
+    <button type="submit" class="btn btn-primary btn-full mt-2">Сохранить</button>
+    <button type="button" class="btn btn-ghost btn-full" onclick="closeModal('venue-modal')">Отмена</button>
+  </form>
+</div>
+
+<!-- Student Modal -->
+<div id="student-modal" class="modal hidden">
+  <div class="modal-handle"></div>
+  <h2 class="modal-title" id="student-modal-title">Ученик</h2>
+  <form id="student-form">
+    <input type="hidden" id="student-id">
+    <div class="form-group">
+      <label class="form-label">Имя *</label>
+      <input type="text" id="student-name" class="form-input" placeholder="Маша Иванова" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Telegram ID</label>
+      <input type="number" id="student-telegram" class="form-input" placeholder="123456789">
+    </div>
+    <div id="student-error" class="error-msg hidden"></div>
+    <button type="submit" class="btn btn-primary btn-full mt-2">Сохранить</button>
+    <button type="button" class="btn btn-ghost btn-full" onclick="closeModal('student-modal')">Отмена</button>
+  </form>
+</div>
+
+<!-- Slot Modal -->
+<div id="slot-modal" class="modal hidden">
+  <div class="modal-handle"></div>
+  <h2 class="modal-title">Новый слот</h2>
+  <form id="slot-form">
+    <div class="form-group">
+      <label class="form-label">Дата *</label>
+      <select id="slot-date" class="form-input" required></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Каток *</label>
+      <select id="slot-venue" class="form-input" required></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Начало *</label>
+      <input type="time" id="slot-time" class="form-input" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Длительность</label>
+      <select id="slot-duration" class="form-input">
+        <option value="30">30 мин</option>
+        <option value="45" selected>45 мин</option>
+        <option value="60">60 мин</option>
+        <option value="90">90 мин</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Тип</label>
+      <div class="radio-group">
+        <label class="radio-label">
+          <input type="radio" name="slot-type" value="INDIVIDUAL" checked> Индивидуальная
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="slot-type" value="GROUP"> Групповая
+        </label>
+      </div>
+    </div>
+    <div class="form-group" id="capacity-group" style="display:none">
+      <label class="form-label">Вместимость</label>
+      <input type="number" id="slot-capacity" class="form-input" value="5" min="2" max="50">
+    </div>
+    <div id="slot-error" class="error-msg hidden"></div>
+    <button type="submit" class="btn btn-primary btn-full mt-2">Добавить</button>
+    <button type="button" class="btn btn-ghost btn-full" onclick="closeModal('slot-modal')">Отмена</button>
+  </form>
+</div>
+
+<!-- Confirm Modal -->
+<div id="confirm-modal" class="modal hidden">
+  <div class="modal-handle"></div>
+  <h2 class="modal-title" id="confirm-title">Подтвердите</h2>
+  <p id="confirm-message" class="confirm-message"></p>
+  <button id="confirm-ok" class="btn btn-danger btn-full">Удалить</button>
+  <button type="button" class="btn btn-ghost btn-full" onclick="closeModal('confirm-modal')">Отмена</button>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/venues.js"></script>
+<script src="js/students.js"></script>
+<script src="js/schedules.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
