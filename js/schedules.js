@@ -135,7 +135,7 @@ function confirmDeleteSlot(slotId) {
   );
 }
 
-function openAddSlotModal() {
+async function openAddSlotModal() {
   const dateSelect = document.getElementById('slot-date');
   dateSelect.innerHTML = '';
   for (let i = 0; i < 7; i++) {
@@ -146,6 +146,10 @@ function openAddSlotModal() {
     opt.value = iso;
     opt.textContent = `${DAY_NAMES[i]}, ${formatDate(iso)}`;
     dateSelect.appendChild(opt);
+  }
+
+  if (!venuesList.length) {
+    try { venuesList = await api.get('/api/venues'); } catch {}
   }
 
   const venueSelect = document.getElementById('slot-venue');
