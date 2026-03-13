@@ -1,11 +1,15 @@
 services:
   planner-admin:
-    image: planner-admin:latest
+    image: ${DOCKER_USERNAME}/planner-admin:${TAG}
+    container_name: planner-admin
+    restart: always
+    environment:
+      TZ: Europe/Moscow
+      PLANNER_API_URL: ${PLANNER_API_URL}
     ports:
       - "3000:80"
-    environment:
-      PLANNER_API_URL: "http://localhost:8071"
-    restart: unless-stopped
+    env_file:
+      - .env
     networks:
       - planner-network
 
