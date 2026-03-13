@@ -1,0 +1,49 @@
+name: Deploy planner-admin
+
+on:
+  push:
+    branches: [master]
+
+env:
+  IMAGE_NAME: planner-admin
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t $IMAGE_NAME:${{ github.sha }} -t $IMAGE_NAME:latest .
+
+      - name: Save image as tar
+        run: docker save $IMAGE_NAME:latest | gzip > planner-admin.tar.gz
+
+      - name: Copy image to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          source: planner-admin.tar.gz
+          target: /tmp
+
+      - name: Deploy on server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            docker load < /tmp/planner-admin.tar.gz
+            docker stop planner-admin || true
+            docker rm planner-admin || true
+            docker run -d \
+              --name planner-admin \
+              --restart unless-stopped \
+              -p 3000:80 \
+              -e PLANNER_API_URL=${{ secrets.PLANNER_API_URL }} \
+              planner-admin:latest
+            rm /tmp/planner-admin.tar.gz
