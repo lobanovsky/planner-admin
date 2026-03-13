@@ -58,7 +58,7 @@ jobs:
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_SSH_KEY }  }
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
           source: ".env, docker-compose.yml"
           target: ${{ secrets.DEPLOY_DIR }}
 
