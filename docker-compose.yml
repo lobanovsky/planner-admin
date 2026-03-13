@@ -6,3 +6,9 @@ services:
     environment:
       PLANNER_API_URL: "http://localhost:8080"
     restart: unless-stopped
+    networks:
+      - planner-network
+
+networks:
+  planner-network:
+    external: true
