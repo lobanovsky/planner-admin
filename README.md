@@ -80,10 +80,46 @@ planner-admin/
 const API_BASE = 'http://localhost:8080';
 ```
 
-При деплое на сервер замените на реальный URL.
+При деплое передаётся через переменную окружения `PLANNER_API_URL` — см. раздел Docker ниже.
 
 ---
 
 ## Аутентификация
 
 JWT сохраняется в `localStorage` под ключом `jwt`. При ответе `401` происходит автоматический выход. Токен действителен 7 дней.
+
+---
+
+## Docker
+
+```bash
+docker build -t planner-admin .
+docker run -p 3000:80 -e PLANNER_API_URL=https://api.example.com planner-admin
+```
+
+Или через docker-compose (предварительно собрав образ):
+
+```bash
+docker compose up
+```
+
+При старте контейнера `docker/entrypoint.sh` подставляет `PLANNER_API_URL` в `js/api.js`. Один образ можно использовать на разных окружениях.
+
+---
+
+## CI/CD (GitHub Actions)
+
+Workflow `.github/workflows/deploy.yml` запускается при пуше в `master`:
+
+1. Собирает Docker-образ
+2. Копирует его на сервер по SSH (`scp`)
+3. Перезапускает контейнер с новым образом
+
+Необходимые secrets в настройках репозитория (Settings → Secrets and variables → Actions):
+
+| Secret | Описание |
+|---|---|
+| `DEPLOY_HOST` | IP или домен сервера |
+| `DEPLOY_USER` | SSH-пользователь |
+| `DEPLOY_SSH_KEY` | Приватный SSH-ключ |
+| `PLANNER_API_URL` | URL бэкенда, например `https://api.example.com` |

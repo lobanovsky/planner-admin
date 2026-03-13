@@ -6,6 +6,7 @@ on:
 
 env:
   IMAGE_NAME: planner-admin
+  DEPLOY_DIR: ${{ vars.DEPLOY_DIR || '/home/mr17dom1/projects/planner-admin' }}
 
 jobs:
   build-and-deploy:
@@ -28,7 +29,7 @@ jobs:
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           source: planner-admin.tar.gz
-          target: /tmp
+          target: ${{ env.DEPLOY_DIR }}
 
       - name: Deploy on server
         uses: appleboy/ssh-action@v1.0.3
@@ -37,7 +38,7 @@ jobs:
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
-            docker load < /tmp/planner-admin.tar.gz
+            docker load < ${{ env.DEPLOY_DIR }}/planner-admin.tar.gz
             docker stop planner-admin || true
             docker rm planner-admin || true
             docker run -d \
@@ -46,4 +47,4 @@ jobs:
               -p 3000:80 \
               -e PLANNER_API_URL=${{ secrets.PLANNER_API_URL }} \
               planner-admin:latest
-            rm /tmp/planner-admin.tar.gz
+            rm ${{ env.DEPLOY_DIR }}/planner-admin.tar.gz
