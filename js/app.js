@@ -19,9 +19,12 @@ function closeModal(id) {
 }
 
 let _confirmCallback = null;
-function openConfirm(title, message, onConfirm) {
+function openConfirm(title, message, onConfirm, okText = 'Удалить', okClass = 'btn-danger') {
   document.getElementById('confirm-title').textContent = title;
   document.getElementById('confirm-message').textContent = message;
+  const okBtn = document.getElementById('confirm-ok');
+  okBtn.textContent = okText;
+  okBtn.className = `btn ${okClass} btn-full`;
   _confirmCallback = onConfirm;
   openModal('confirm-modal');
 }

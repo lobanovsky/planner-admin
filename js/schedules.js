@@ -66,6 +66,7 @@ async function loadSchedule() {
     if (currentTemplate.status === 'DRAFT') {
       renderSlots(document.getElementById('slots-list'), currentSlots, true);
       draftEl.classList.remove('hidden');
+      updatePublishBtn();
     } else {
       renderSlots(document.getElementById('slots-list-pub'), currentSlots, false);
       pubEl.classList.remove('hidden');
@@ -73,6 +74,17 @@ async function loadSchedule() {
   } catch (err) {
     emptyEl.classList.remove('hidden');
     document.querySelector('#schedule-empty p').textContent = 'Ошибка загрузки: ' + (err.message || '');
+  }
+}
+
+function updatePublishBtn() {
+  const btn = document.getElementById('publish-btn');
+  const errEl = document.getElementById('schedule-error');
+  const hasSlots = currentSlots.length > 0;
+  btn.disabled = !hasSlots;
+  if (hasSlots) {
+    errEl.classList.add('hidden');
+    errEl.textContent = '';
   }
 }
 
@@ -132,7 +144,9 @@ async function publishSchedule() {
     async () => {
       await api.post(`/api/schedules/${currentTemplate.id}/publish`);
       await loadSchedule();
-    }
+    },
+    'Опубликовать',
+    'btn-primary'
   );
 }
 

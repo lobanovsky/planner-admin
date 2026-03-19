@@ -164,6 +164,7 @@ html, body {
 .btn-ghost { background: var(--gray-100); color: var(--gray-600); }
 .btn-sm { min-height: 36px; padding: 0 14px; font-size: 0.85rem; border-radius: 8px; }
 .btn-full { width: 100%; }
+.btn:disabled { background: var(--gray-200); color: var(--gray-400); cursor: not-allowed; pointer-events: none; }
 .btn-icon {
   background: none;
   border: none;
